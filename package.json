@@ -7,9 +7,6 @@
     "@dojo/shim": "~0.2.7",
     "@dojo/i18n": "~0.6.0",
     "@dojo/widget-core": "~0.10.0",
-    "@dojo/routing": "~0.6.0",
-    "@dojo/stores": "~0.5.0",
-    "@dojo/widgets": "~0.7.0",
     "resize-observer-polyfill": "~1.5.0",
     "tslib": "~1.8.1"
   },
