@@ -1,6 +1,6 @@
 {
-  "name": "brj-widget-core",
-  "version": "1.0.0",
+  "name": "widget-core-designer",
+  "version": "0.0.1",
   "dependencies": {
     "@dojo/core": "~2.0.0",
     "@dojo/has": "~2.0.0",
@@ -18,6 +18,10 @@
     "@types/grunt": "~0.4.0",
     "@types/node": "^6.0.46",
     "@types/sinon": "^1.16.35",
+    "grunt": "^1.0.1",
+    "grunt-dojo2": "^0.1.3",
+    "grunt-tslint": "^5.0.1",
+    "load-grunt-tasks": "^3.5.2",
     "intern": "~4.1.5",
     "lint-staged": "6.0.0",
     "prettier": "1.9.2",
