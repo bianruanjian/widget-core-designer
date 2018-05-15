@@ -40,7 +40,11 @@ export default class EditableWidgetBase extends WidgetBase<EditableWidgetPropert
 	private _focus(
 		onFocus:
 			| ((
-					payload: { activeWidgetDimensions: Readonly<DimensionResults>; activeWidgetId: string | number; reRenderOperatePane: boolean }
+					payload: { 
+						activeWidgetDimensions: Readonly<DimensionResults>; 
+						activeWidgetId: string | number; 
+						reRenderOperatePane: boolean //是否重绘操作面板
+					}
 				) => void)
 			| undefined,
 		activeWidgetId: string | number
