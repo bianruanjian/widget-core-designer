@@ -25,7 +25,7 @@ export default class EditableWidgetBase extends WidgetBase<EditableWidgetPropert
 			payload: { 
 				activeWidgetDimensions: Readonly<DimensionResults>; 
 				activeWidgetId: string | number; 
-				reRenderOperatePane: boolean //是否重绘操作面板
+				reRenderOperatePane: boolean // 是否重绘操作面板
 			}
 		) => void
 	) {
@@ -47,7 +47,7 @@ export default class EditableWidgetBase extends WidgetBase<EditableWidgetPropert
 					payload: { 
 						activeWidgetDimensions: Readonly<DimensionResults>; 
 						activeWidgetId: string | number; 
-						reRenderOperatePane: boolean //是否重绘操作面板
+						reRenderOperatePane: boolean // 是否重绘操作面板
 					}
 				) => void)
 			| undefined,
