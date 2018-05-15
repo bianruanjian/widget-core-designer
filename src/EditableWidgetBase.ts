@@ -22,7 +22,11 @@ export default class EditableWidgetBase extends WidgetBase<EditableWidgetPropert
 		widget: UIInstWidget,
 		activeWidgetId: string | number,
 		onFocus: (
-			payload: { activeWidgetDimensions: Readonly<DimensionResults>; activeWidgetId: string | number }
+			payload: { 
+				activeWidgetDimensions: Readonly<DimensionResults>; 
+				activeWidgetId: string | number; 
+				reRenderOperatePane: boolean // 是否重绘操作面板
+			}
 		) => void
 	) {
 		if (this._isFocus(widget, activeWidgetId)) {
@@ -43,7 +47,7 @@ export default class EditableWidgetBase extends WidgetBase<EditableWidgetPropert
 					payload: { 
 						activeWidgetDimensions: Readonly<DimensionResults>; 
 						activeWidgetId: string | number; 
-						reRenderOperatePane: boolean //是否重绘操作面板
+						reRenderOperatePane: boolean // 是否重绘操作面板
 					}
 				) => void)
 			| undefined,
