@@ -141,6 +141,7 @@ export interface EditableWidgetProperties extends WidgetProperties {
 		payload: {
 			activeWidgetDimensions: Readonly<DimensionResults>;
 			activeWidgetId: string | number;
+			reRenderOperatePane: boolean;
 		}
 	) => void;
 	activeWidgetId: string | number;

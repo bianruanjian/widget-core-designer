@@ -15,7 +15,7 @@ export default class EditableWidgetBase extends WidgetBase<EditableWidgetPropert
 		event.stopImmediatePropagation();
 		const { onFocus, widget } = this.properties;
 		const dimensions = this.meta(Dimensions).get(this.rootKey);
-		onFocus && onFocus({ activeWidgetDimensions: dimensions, activeWidgetId: widget.id });
+		onFocus && onFocus({ activeWidgetDimensions: dimensions, activeWidgetId: widget.id, reRenderOperatePane: true });
 	}
 
 	protected tryFocus(
@@ -40,7 +40,7 @@ export default class EditableWidgetBase extends WidgetBase<EditableWidgetPropert
 	private _focus(
 		onFocus:
 			| ((
-					payload: { activeWidgetDimensions: Readonly<DimensionResults>; activeWidgetId: string | number }
+					payload: { activeWidgetDimensions: Readonly<DimensionResults>; activeWidgetId: string | number; reRenderOperatePane: boolean }
 				) => void)
 			| undefined,
 		activeWidgetId: string | number
@@ -48,7 +48,7 @@ export default class EditableWidgetBase extends WidgetBase<EditableWidgetPropert
 		const activeWidgetDimensions = this.meta(Dimensions).get(this.rootKey);
 		// 2. 当 page 的大小发生变化后，通知聚焦框
 		this.meta(Resize).get(this.rootKey);
-		onFocus && onFocus({ activeWidgetDimensions, activeWidgetId });
+		onFocus && onFocus({ activeWidgetDimensions, activeWidgetId, reRenderOperatePane: false });
 
 		this._dimensions = activeWidgetDimensions;
 	}
