@@ -106,13 +106,13 @@ export interface AttachedUIWidgetProperty extends UIWidgetProperty {
  *
  * 编辑器专用的 UI 实例部件，在渲染时使用
  *
- * @property id                 归属于模块的部件标识
- * @property widgetId           实例部件标识
- * @property widgetName         实例部件名称，此名称用作动态加载模块的注册 Label
- * @property widgetModuleName   实例部件模块名
- * @property properties         实例部件属性
- * @property overlay            是否在部件上添加遮盖层，默认为 false
- * @property parentId           模块中父部件标识，根部件的父标识为 -1
+ * @property id					归属于模块的部件标识
+ * @property widgetId			实例部件标识
+ * @property widgetName			实例部件名称，此名称用作动态加载模块的注册 Label
+ * @property widgetModuleName	实例部件模块名
+ * @property properties			实例部件属性
+ * @property overlay			是否在部件上添加遮盖层，默认为 false
+ * @property parentId			模块中父部件标识，根部件的父标识为 -1
  */
 export interface UIInstWidget {
 	id: string;

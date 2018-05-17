@@ -23,10 +23,10 @@ export interface DesignerWidgetMixin {
 // 3. 覆盖部件的获取焦点效果
 // 4. 为空容器增加可视化效果
 function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base: T): T & Constructor<DesignerWidgetMixin> {
-	abstract class designer extends Base {
+	abstract class Designable extends Base {
 		public abstract properties: EditableWidgetProperties;
 
-		private _dimensions:DimensionResults|undefined;
+		private _dimensions: DimensionResults|undefined;
 
 		private _onMouseUp(event: MouseEvent) {
 			event.stopImmediatePropagation();
@@ -43,7 +43,7 @@ function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base:
 			return false;
 		}
 
-		protected get dimensions() {
+		private get dimensions() {
 			if (this._dimensions) {
 				return this._dimensions;
 			}
@@ -52,35 +52,33 @@ function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base:
 
 		@beforeProperties()
 		protected beforeProperties() {
-			if (this.properties.widget) {
-				// 如果是空容器，则添加可视化效果
-				if (this.isContainer() && this.children.length < 1) {
-					return {
-						extraClasses: { 'root': css.emptyContainer }, ...this.properties, ...this.properties.widget.properties
-					}
-				} else {
-					return {
-						...this.properties, ...this.properties.widget.properties
-					}
-				}
+			if (!this.properties.widget) {
+				return { ...this.properties };
 			}
-			return { ...this.properties };
+			// 如果是空容器，则添加可视化效果
+			if (this.isContainer() && this.children.length < 1) {
+				return {
+					extraClasses: { 'root': css.emptyContainer }, ...this.properties, ...this.properties.widget.properties
+				}
+			} 
+			return {
+				...this.properties, ...this.properties.widget.properties
+			}
 		}
 
 		@beforeRender()
 		protected beforeRender(){
 			const { widget, activeWidgetId, onFocus } = this.properties;
-			this.tryFocus(widget, activeWidgetId, onFocus);
+			this._tryFocus(widget, activeWidgetId, onFocus);
 		}
 
-		//1. 尝试聚焦
-		//2. 绑定 onmouseup 事件
-		//3. input部件需要增加遮盖层节点
+		// 1. 尝试聚焦
+		// 2. 绑定 onmouseup 事件
+		// 3. input部件需要增加遮盖层节点
 		@afterRender()
 		protected afterRender(result: DNode | DNode[]): DNode | DNode[] {
-
 			const key = String(this.properties.key);
-			//若为虚拟节点数组需要遍历所有节点，找到应用了key的节点，再添加onmouseup事件
+			// 若为虚拟节点数组需要遍历所有节点，找到应用了key的节点，再添加onmouseup事件
 			if (Array.isArray(result)) {
 				let node = find((result as DNode[]), (elm, index, array) => {
 					return (elm as VNode).properties.key === key;
@@ -99,7 +97,7 @@ function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base:
 			return widget.id === activeWidgetId;
 		}
 
-		protected tryFocus(
+		private _tryFocus(
 			widget: UIInstWidget,
 			activeWidgetId: string | number,
 			onFocus: (
@@ -114,7 +112,7 @@ function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base:
 			}
 		}
 
-		protected _focus(
+		private _focus(
 			onFocus: (
 				payload: {
 					activeWidgetDimensions: Readonly<DimensionResults>;
@@ -129,6 +127,6 @@ function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base:
 		}
 
 	};
-	return designer;
+	return Designable;
 }
 export default DesignerWidgetMixin;

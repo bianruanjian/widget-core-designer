@@ -5,10 +5,10 @@
 
 将用户自定义部件转换为可在设计器中使用的部件，提供以下功能：
 
-1. 测量部件尺寸
-2. 增加遮盖层屏蔽部件中与设计器冲突的事件
-3. 覆盖部件的获取焦点效果
-4. 为空容器增加可视化效果
+1. 测量部件尺寸;
+2. 增加遮盖层屏蔽部件中与设计器冲突的事件;
+3. 覆盖部件的获取焦点效果;
+4. 为空容器增加可视化效果。
 
 ## 如何打包项目
 
@@ -50,88 +50,22 @@ grunt dist
 1. 自定义部件
 
 ```typescript
-import { v } from '@dojo/widget-core/d';
-import { DNode } from '@dojo/widget-core/interfaces';
-import { endsWith } from '@dojo/shim/string';
-import { ThemedMixin, theme, ThemedProperties } from '@dojo/widget-core/mixins/Themed';
-import { WidgetBase } from '@dojo/widget-core/WidgetBase';
-import { customElement } from '@dojo/widget-core/decorators/customElement';
-import { CustomElementChildType } from '@dojo/widget-core/registerCustomElement';
-import * as css from './styles/view.m.css';
 
-/**
- * @type viewProperties
- *
- * Properties that can be set on view components
- */
-export interface ViewProperties
-	extends 
-		ThemedProperties {
-	widgetId?: string;
-	maxWidth?: number | string;
+export class UserCustomWidgetBase<P extends UserCustomWidgetProperties = UserCustomWidgetProperties> extends ThemedBase<P> {
+    ...
 }
 
-export const ThemedBase = ThemedMixin(WidgetBase);
-
-@customElement<ViewProperties>({
-	tag: 'db-view',
-	childType: CustomElementChildType.TEXT,
-	attributes: [
-		'widgetId',
-		'maxWidth'
-	],
-	properties: [],
-	events: []
-})
-@theme(css)
-export class ViewBase<P extends ViewProperties = ViewProperties> extends ThemedBase<P> {
-	private _getMaxWidthStyles() {
-		let { maxWidth } = this.properties;
-
-		let maxWidthStyles: any = {};
-
-		if (maxWidth) {
-			if (typeof maxWidth == 'number') {
-				maxWidthStyles.maxWidth = `${maxWidth}px`;
-			} else if (endsWith(maxWidth as string, '%')) {
-				maxWidthStyles.maxWidth = maxWidth;
-			} else {
-				maxWidthStyles.maxWidth = `${maxWidth}px`;
-			}
-		}
-
-		return maxWidthStyles;
-	}
-
-	protected render(): DNode | DNode[] {
-		let { widgetId } = this.properties;
-
-		return v(
-			'div',
-			{
-				id: widgetId,
-				key: 'view',
-				classes: [
-					this.theme(css.root),
-				],
-				styles: { ...this._getMaxWidthStyles() }
-			},
-			this.children
-		);
-	}
-}
-
-export default class View extends ViewBase<ViewProperties> {}
+export default class UserCustomWidget extends UserCustomWidgetBase<UserCustomWidgetProperties> {}
 
 ```
 
 2. 设计器使用的部件
 
 ```typescript
-import PreView from './widgets/View';
+import UserCustomWidgetBase from './widgets/UserCustomWidget';
 import DesignerWidgetMixin from './DesignerWidgetMixin';
 
-export class View extends DesignerWidgetMixin(PreView){
+export class DesignableUserCustomWidget extends DesignerWidgetMixin(UserCustomWidgetBase){
     
     protected isContainer(){
        return true;
@@ -142,5 +76,5 @@ export class View extends DesignerWidgetMixin(PreView){
     }
 }
 
-export default View;
+export default DesignableUserCustomWidget;
 ```
