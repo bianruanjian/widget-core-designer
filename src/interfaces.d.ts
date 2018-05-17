@@ -141,7 +141,6 @@ export interface EditableWidgetProperties extends WidgetProperties {
 		payload: {
 			activeWidgetDimensions: Readonly<DimensionResults>;
 			activeWidgetId: string | number;
-			reRenderOperatePane: boolean;// 是否重绘操作面板
 		}
 	) => void;
 	activeWidgetId: string | number;
