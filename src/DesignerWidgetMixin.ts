@@ -22,7 +22,7 @@ export interface DesignerWidgetMixin {
 // 2. 增加遮盖层屏蔽部件中与设计器冲突的事件
 // 3. 覆盖部件的获取焦点效果
 // 4. 为空容器增加可视化效果
-function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base: T): T & Constructor<DesignerWidgetMixin> {
+export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base: T): T & Constructor<DesignerWidgetMixin> {
 	abstract class Designable extends Base {
 		public abstract properties: EditableWidgetProperties;
 
