@@ -17,10 +17,12 @@ export default class Overlay extends WidgetBase<OverlayProperties> {
 			'div',
 			{
 				classes: css.root,
-				style: `top: 0px; 
-                left: 0px; 
-                height: ${dimensions.size.height}px; 
-                width: ${dimensions.size.width}px`
+				styles: {
+					top: '0px',
+					left: '0px',
+					height: `${dimensions.size.height}px`,
+					width: `${dimensions.size.width}px`
+				}
 			},
 			[]
 		);

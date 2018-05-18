@@ -1,6 +1,6 @@
 {
   "name": "widget-core-designer",
-  "version": "0.0.4-pre",
+  "version": "0.0.4",
   "dependencies": {
     "@dojo/core": "~2.0.0",
     "@dojo/has": "~2.0.0",
@@ -25,6 +25,7 @@
     "intern": "~4.1.5",
     "lint-staged": "6.0.0",
     "prettier": "1.9.2",
+    "husky": "0.14.3",
     "typescript": "~2.6.1"
   },
   "scripts": {
