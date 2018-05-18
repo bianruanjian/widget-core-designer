@@ -1,6 +1,6 @@
 {
   "name": "widget-core-designer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "@dojo/core": "~2.0.0",
     "@dojo/has": "~2.0.0",
