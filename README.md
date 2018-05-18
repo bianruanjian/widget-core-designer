@@ -34,8 +34,8 @@ grunt dist
     export default class UserCustomWidget extends DesignerWidgetMixin(UserCustomWidgetBase){}
     ```
 4. 根据部件特性进行部分属性的定制：
-    1. 复写`isContainer`方法，该方法默认返回`false`，用于标识是否是容器部件，即内容为空时需要在设计器中默认撑开一定高度。
-    2. 复写`needOverlay`方法，该方法默认返回`false`，针对输入框之类的部件需要在设计器中阻止点击事件，增加遮盖层。
+    1. 覆写`isContainer`方法，该方法默认返回`false`，用于标识是否是容器部件，即内容为空时需要在设计器中默认撑开一定高度。
+    2. 覆写`needOverlay`方法，该方法默认返回`false`，针对输入框之类的部件需要在设计器中阻止点击事件，增加遮盖层。
     ```typescript
     protected isContainer(){
         return false;
