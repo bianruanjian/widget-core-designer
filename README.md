@@ -6,19 +6,17 @@
 将用户自定义部件转换为可在设计器中使用的部件，提供以下功能：
 
 1. 测量部件尺寸;
-2. 增加遮盖层屏蔽部件中与设计器冲突的事件;
+2. 增加遮盖层，屏蔽部件与设计器冲突的事件;
 3. 覆盖部件的获取焦点效果;
-4. 为空容器增加可视化效果。
+4. 为空容器增加可视化效果等。
 
-## 如何打包项目
+## 如何使用
 
-进入项目文件夹，执行以下命令：
+在你的项目中使用`widget-core-designer`时，需使用以下命令安装此包
 
 ```bash
-grunt dist
+npm install widget-core-designer
 ```
-
-完成
 
 ## 如何开发设计器版部件
 
@@ -77,4 +75,12 @@ export class UserCustomWidget extends DesignerWidgetMixin(UserCustomWidgetBase){
 }
 
 export default UserCustomWidget;
+```
+
+## 如何打包项目
+
+进入项目的根目录，执行以下命令：
+
+```bash
+grunt dist
 ```
