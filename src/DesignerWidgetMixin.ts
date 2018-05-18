@@ -80,23 +80,19 @@ function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base:
 			const key = String(this.properties.key);
 			// 若为虚拟节点数组需要遍历所有节点，找到应用了key的节点，再添加onmouseup事件
 			if (Array.isArray(result)) {
-				let node = find((result as DNode[]), (elm, index, array) => {
+				result =result as DNode[];
+				let node = find(result, (elm, index, array) => {
 					return (elm as VNode).properties.key === key;
 				});
 				(node as VNode).properties.onmouseup = this._onMouseUp;
 			} else {
 				(result as VNode).properties.onmouseup = this._onMouseUp;
-			}
-			if (Array.isArray(result)) {
-				if (this.needOverlay()) {
-					return [...(result as DNode[]), w(Overlay, { dimensions: this.dimensions })]
-				}
-				return [...(result as DNode[])];
+				result = [result];
 			}
 			if (this.needOverlay()) {
-				return [result, w(Overlay, { dimensions: this.dimensions })]
+				return [...result, w(Overlay, { dimensions: this.dimensions })]
 			}
-			return [result];
+			return [...result];
 		}
 
 		private _isFocus(widget: UIInstWidget, activeWidgetId: string | number) {
