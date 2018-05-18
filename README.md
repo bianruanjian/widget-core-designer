@@ -31,18 +31,18 @@ grunt dist
     ```
 3. 将原部件的属性与设计器部件的相关属性混合：
     ```typescript
-    export default class View extends EditableMixin(ViewBase){}
+    export default class UserCustomWidget extends DesignerWidgetMixin(UserCustomWidgetBase){}
     ```
 4. 根据部件特性进行部分属性的定制：
     1. 复写`isContainer`方法，该方法默认返回`false`，用于标识是否是容器部件，即内容为空时需要在设计器中默认撑开一定高度。
     2. 复写`needOverlay`方法，该方法默认返回`false`，针对输入框之类的部件需要在设计器中阻止点击事件，增加遮盖层。
     ```typescript
-        protected isContainer(){
-            return false;
-        }
-        protected needOverlay(){
-            return false;
-        }
+    protected isContainer(){
+        return false;
+    }
+    protected needOverlay(){
+        return false;
+    }
     ```
 
 ### 示例代码
@@ -65,7 +65,7 @@ export default class UserCustomWidget extends UserCustomWidgetBase<UserCustomWid
 import UserCustomWidgetBase from './widgets/UserCustomWidget';
 import DesignerWidgetMixin from './DesignerWidgetMixin';
 
-export class DesignableUserCustomWidget extends DesignerWidgetMixin(UserCustomWidgetBase){
+export class UserCustomWidget extends DesignerWidgetMixin(UserCustomWidgetBase){
     
     protected isContainer(){
        return true;
@@ -76,5 +76,5 @@ export class DesignableUserCustomWidget extends DesignerWidgetMixin(UserCustomWi
     }
 }
 
-export default DesignableUserCustomWidget;
+export default UserCustomWidget;
 ```
