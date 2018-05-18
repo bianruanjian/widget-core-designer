@@ -87,10 +87,16 @@ function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase>(Base:
 			} else {
 				(result as VNode).properties.onmouseup = this._onMouseUp;
 			}
-			if (this.needOverlay()) {
-				return [...result, w(Overlay, { dimensions: this.dimensions })]
+			if (Array.isArray(result)) {
+				if (this.needOverlay()) {
+					return [...(result as DNode[]), w(Overlay, { dimensions: this.dimensions })]
+				}
+				return [...(result as DNode[])];
 			}
-			return [...result];
+			if (this.needOverlay()) {
+				return [result, w(Overlay, { dimensions: this.dimensions })]
+			}
+			return [result];
 		}
 
 		private _isFocus(widget: UIInstWidget, activeWidgetId: string | number) {
