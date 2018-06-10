@@ -73,7 +73,7 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			if (Array.isArray(result)) {
 				result = result as DNode[];
 				let node = find(result, (elm, index, array) => {
-					return elm !== null && typeof (elm as VNode).properties.key !== undefined;
+					return elm !== null && (elm as VNode).properties.key !== undefined;
 				});
 				(node as VNode).properties.onmouseup = this._onMouseUp;
 				key = String((node as VNode).properties.key);
