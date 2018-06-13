@@ -7,13 +7,13 @@ import { VNode } from '@dojo/widget-core/interfaces';
 
 export interface OverlayProperties {
 	dimensions: DimensionResults;
-	onMouseUp: (event?:MouseEvent)=>boolean|void; 
+	onMouseUp: (event?: MouseEvent) => boolean | void;
 }
 
 // 注意，Overlay 只能放在原子部件上，不能放在容器部件上。
 export default class Overlay extends WidgetBase<OverlayProperties> {
 	protected render(): VNode {
-		const { dimensions,onMouseUp } = this.properties;
+		const { dimensions, onMouseUp } = this.properties;
 		return v(
 			'div',
 			{
