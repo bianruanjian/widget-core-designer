@@ -29,11 +29,13 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 
 		private _key: string = '';
 
-		private _onMouseUp(event: MouseEvent) {
-			event.stopImmediatePropagation();
-			const { onFocus, widget } = this.properties;
-			const dimensions = this.meta(Dimensions).get(this._key);
-			onFocus && onFocus({ activeWidgetDimensions: dimensions, activeWidgetId: widget.id });
+		private _onMouseUp(event?: MouseEvent) {
+			if(event){
+				event.stopImmediatePropagation();
+				const { onFocus, widget } = this.properties;
+				const dimensions = this.meta(Dimensions).get(this._key);
+				onFocus && onFocus({ activeWidgetDimensions: dimensions, activeWidgetId: widget.id });
+			}
 		}
 
 		protected isContainer(): boolean {
@@ -87,7 +89,7 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			const { widget, activeWidgetId, onFocus } = this.properties;
 			this._tryFocus(widget, activeWidgetId, onFocus, key);
 			if (this.needOverlay()) {
-				return [...result, w(Overlay, { dimensions: this.meta(Dimensions).get(key) })];
+				return [...result, w(Overlay, { dimensions: this.meta(Dimensions).get(key),onMouseUp:this._onMouseUp })];
 			}
 			return [...result];
 		}
