@@ -29,11 +29,13 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 
 		private _key: string = '';
 
-		private _onMouseUp(event: MouseEvent) {
-			event.stopImmediatePropagation();
-			const { onFocus, widget } = this.properties;
-			const dimensions = this.meta(Dimensions).get(this._key);
-			onFocus && onFocus({ activeWidgetDimensions: dimensions, activeWidgetId: widget.id });
+		private _onMouseUp(event?: MouseEvent) {
+			if (event) {
+				event.stopImmediatePropagation();
+				const { onFocus, widget } = this.properties;
+				const dimensions = this.meta(Dimensions).get(this._key);
+				onFocus && onFocus({ activeWidgetDimensions: dimensions, activeWidgetId: widget.id });
+			}
 		}
 
 		protected isContainer(): boolean {
@@ -70,16 +72,17 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		protected afterRender(result: DNode | DNode[]): DNode | DNode[] {
 			// 若为虚拟节点数组需要遍历所有节点，找到应用了key的节点，再添加onmouseup事件
 			let key: string;
+			let widgetNode: VNode;
 			if (Array.isArray(result)) {
 				result = result as DNode[];
 				let node = find(result, (elm, index, array) => {
 					return elm !== null && (elm as VNode).properties.key !== undefined;
 				});
-				(node as VNode).properties.onmouseup = this._onMouseUp;
-				key = String((node as VNode).properties.key);
+				widgetNode = node as VNode;
+				key = String(widgetNode.properties.key);
 			} else {
-				(result as VNode).properties.onmouseup = this._onMouseUp;
-				key = String((result as VNode).properties.key);
+				widgetNode = result as VNode;
+				key = String(widgetNode.properties.key);
 				result = [result];
 			}
 			this._key = key;
@@ -87,7 +90,14 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			const { widget, activeWidgetId, onFocus } = this.properties;
 			this._tryFocus(widget, activeWidgetId, onFocus, key);
 			if (this.needOverlay()) {
-				return [...result, w(Overlay, { dimensions: this.meta(Dimensions).get(key) })];
+				// 遮盖层覆盖住了部件节点，需要将 onMouseUp 事件传给遮盖层
+				return [
+					...result,
+					w(Overlay, { dimensions: this.meta(Dimensions).get(key), onMouseUp: this._onMouseUp })
+				];
+			} else {
+				// 没有遮盖层时需要绑定 onMouseUp 事件到部件节点上
+				widgetNode.properties.onmouseup = this._onMouseUp;
 			}
 			return [...result];
 		}
