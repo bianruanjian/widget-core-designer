@@ -4,11 +4,10 @@ import { afterRender } from '@dojo/widget-core/decorators/afterRender';
 import { Constructor, DNode, VNode } from '@dojo/widget-core/interfaces';
 import { WidgetBase } from '@dojo/widget-core/WidgetBase';
 import { beforeProperties } from '@dojo/widget-core/decorators/beforeProperties';
-
 import * as css from './styles/base.m.css';
 import Overlay from './Overlay';
 import { find } from '@dojo/shim/array';
-import { w } from '@dojo/widget-core/d';
+import { v, w } from '@dojo/widget-core/d';
 import { Resize } from '@dojo/widget-core/meta/Resize';
 import { EditableWidgetProperties } from './interfaces';
 
@@ -28,6 +27,22 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		public abstract properties: EditableWidgetProperties;
 
 		private _key: string = '';
+
+		/**
+		 * 问题描述
+		 * 部件聚焦时，当通过修改属性值调整聚焦部件的位置且不会触发 Resize Observer 时，
+		 * 如调整 Float 的值，则需要一种方法来触发聚焦部件的重绘方法以获取正确的位置信息（用于重绘聚焦框）。
+		 *
+		 * 注意，Resize Observer 只有在改变了 DOM 节点的 content rect size 时才会触发，而如果将 float 的值从 left 改为 right 时，
+		 * DOM 节点的位置发生了变化，而 rect size 并没有发生变化，
+		 * 所以没有触发 Resize Observer，参见 https://wicg.github.io/ResizeObserver/#content-rect。
+		 *
+		 * 解决方法
+		 *
+		 * 在聚焦部件里添加一个子节点，然后在子部件上传入 deferred properties 来延迟触发 tryFocus 方法，
+		 * 即每次绘制完聚焦部件后，都会调用 tryFocus 方法，从而获取到正确的位置信息，实现聚焦框的准确定位。
+		 */
+		private _triggerResizeWidgetKey: string = '__triggerResize__'; // 如果是系统内使用的字符串，则在字符串的前后分别增加两个 '_'
 
 		private _onMouseUp(event?: MouseEvent) {
 			if (event) {
@@ -52,7 +67,10 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				return { ...properties };
 			}
 			// 如果是空容器，则添加可视化效果
-			if (this.isContainer() && this.children.length < 1) {
+			// 当前判断为空容器的条件有:
+			// 1. 不包含子节点且 isContainer 返回 true 的部件
+			// 2. isContainer 返回 true 子节点中只有游标或者内置的触发 tryFocus 方法的部件
+			if (this.isContainer() && (this.children.length === 0 || this._onlyContainsCursorOrTriggerResizeWidget())) {
 				return {
 					extraClasses: { root: css.emptyContainer },
 					...properties,
@@ -63,6 +81,31 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				...properties,
 				...properties.widget.properties
 			};
+		}
+
+		/**
+		 * 一个空容器中最多会包含两个在设计器中使用的特殊部件，
+		 * 一个是用于显示光标(Cursor)的部件，一个用于延迟触发 tryFocus 方法的部件，
+		 * 这两个不是用户添加的部件，所以要过滤出来。
+		 * 一个空容器中有以上两个部件时，约定：
+		 * 1. 光标作为第一个节点；
+		 * 2. 延迟触发 tryFocus 方法的部件作为最后一个节点。
+		 */
+		private _onlyContainsCursorOrTriggerResizeWidget() {
+			if (this.children.length > 2) {
+				return false;
+			}
+			const cursorProperties = (this.children[0]! as VNode).properties.widget;
+			if (cursorProperties.widgetName === 'Cursor') {
+				if (this.children.length === 1) {
+					return true;
+				}
+				const triggerResizeWidgetProperties = (this.children[1]! as VNode).properties;
+				if (triggerResizeWidgetProperties.key === this._triggerResizeWidgetKey) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		// 1. 尝试聚焦
@@ -86,9 +129,6 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				result = [result];
 			}
 			this._key = key;
-
-			const { widget, activeWidgetId, onFocus } = this.properties;
-			this._tryFocus(widget, activeWidgetId, onFocus, key);
 			if (this.needOverlay()) {
 				// 遮盖层覆盖住了部件节点，需要将 onMouseUp 事件传给遮盖层
 				return [
@@ -99,7 +139,38 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				// 没有遮盖层时需要绑定 onMouseUp 事件到部件节点上
 				widgetNode.properties.onmouseup = this._onMouseUp;
 			}
+			this._resize(key);
 			return [...result];
+		}
+
+		private _resize(key: string) {
+			const { widget, activeWidgetId, onFocus } = this.properties;
+			if (this._isFocus(widget, activeWidgetId)) {
+				if (!this._hasResized()) {
+					// 防止渲染多个 triggerResizeWidget 造成 key 重复报错
+					this.children.push(
+						v('div', (inserted: boolean) => {
+							this._tryFocus(widget, activeWidgetId, onFocus, key);
+							return { key: this._triggerResizeWidgetKey };
+						})
+					);
+				}
+			}
+		}
+
+		private _hasResized() {
+			if (this.children) {
+				const node = find(this.children, (child) => {
+					return (
+						(child as VNode).properties.key !== undefined &&
+						(child as VNode).properties.key === this._triggerResizeWidgetKey
+					);
+				});
+				if (node) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private _isFocus(widget: UIInstWidget, activeWidgetId: string | number) {
