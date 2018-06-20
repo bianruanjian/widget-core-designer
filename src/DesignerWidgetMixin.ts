@@ -4,11 +4,10 @@ import { afterRender } from '@dojo/widget-core/decorators/afterRender';
 import { Constructor, DNode, VNode } from '@dojo/widget-core/interfaces';
 import { WidgetBase } from '@dojo/widget-core/WidgetBase';
 import { beforeProperties } from '@dojo/widget-core/decorators/beforeProperties';
-
 import * as css from './styles/base.m.css';
 import Overlay from './Overlay';
 import { find } from '@dojo/shim/array';
-import { w } from '@dojo/widget-core/d';
+import { v, w } from '@dojo/widget-core/d';
 import { Resize } from '@dojo/widget-core/meta/Resize';
 import { EditableWidgetProperties } from './interfaces';
 
@@ -28,6 +27,8 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		public abstract properties: EditableWidgetProperties;
 
 		private _key: string = '';
+
+		private _prepend: string = '__prepend__';
 
 		private _onMouseUp(event?: MouseEvent) {
 			if (event) {
@@ -52,7 +53,10 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				return { ...properties };
 			}
 			// 如果是空容器，则添加可视化效果
-			if (this.isContainer() && this.children.length < 1) {
+			// 当前判断为空容器的条件有:
+			// 1. 不包含子节点且isContainer返回true的部件
+			// 2. isContainer 返回 true 子节点中只有游标或者内置的prepend节点
+			if (this.isContainer() && (this.children.length === 0 || this._onlyContainsCursorOrPrepend())) {
 				return {
 					extraClasses: { root: css.emptyContainer },
 					...properties,
@@ -63,6 +67,23 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				...properties,
 				...properties.widget.properties
 			};
+		}
+
+		private _onlyContainsCursorOrPrepend() {
+			if (this.children.length > 2) {
+				return false;
+			}
+			const cursorProperties = (this.children[0]! as VNode).properties.widget;
+			if (cursorProperties.widgetName === 'Cursor') {
+				if (this.children.length === 1) {
+					return true;
+				}
+				const prependProperties = (this.children[1]! as VNode).properties;
+				if (prependProperties.key === this._prepend) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		// 1. 尝试聚焦
@@ -86,9 +107,6 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				result = [result];
 			}
 			this._key = key;
-
-			const { widget, activeWidgetId, onFocus } = this.properties;
-			this._tryFocus(widget, activeWidgetId, onFocus, key);
 			if (this.needOverlay()) {
 				// 遮盖层覆盖住了部件节点，需要将 onMouseUp 事件传给遮盖层
 				return [
@@ -99,7 +117,34 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				// 没有遮盖层时需要绑定 onMouseUp 事件到部件节点上
 				widgetNode.properties.onmouseup = this._onMouseUp;
 			}
+			this._resize(key);
 			return [...result];
+		}
+
+		private _resize(key: string) {
+			const { widget, activeWidgetId, onFocus } = this.properties;
+			if (this._isFocus(widget, activeWidgetId)) {
+				if (!this._havePrepend()) {
+					// 防止渲染多个 prepend 造成key重复报错
+					this.children.push(
+						v('div', (inserted: boolean) => {
+							this._tryFocus(widget, activeWidgetId, onFocus, key);
+							return { key: this._prepend }; // 系统内置的节点前后均在前后加两个`_`以做区分
+						})
+					);
+				}
+			}
+		}
+
+		private _havePrepend() {
+			if (this.children) {
+				this.children.forEach((child) => {
+					if ((child as VNode).properties.key && (child as VNode).properties.key === this._prepend) {
+						return true;
+					}
+				});
+			}
+			return false;
 		}
 
 		private _isFocus(widget: UIInstWidget, activeWidgetId: string | number) {
