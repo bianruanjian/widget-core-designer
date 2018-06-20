@@ -42,7 +42,7 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		 * 在聚焦部件里添加一个子节点，然后在子部件上传入 deferred properties 来延迟触发 tryFocus 方法，
 		 * 即每次绘制完聚焦部件后，都会调用 tryFocus 方法，从而获取到正确的位置信息，实现聚焦框的准确定位。
 		 */
-		private _triggerResizeWidgetKey: string = '__prepend__'; // 如果是系统内使用的字符串，则在字符串的前后分别增加两个 '_'
+		private _triggerResizeWidgetKey: string = '__triggerResize__'; // 如果是系统内使用的字符串，则在字符串的前后分别增加两个 '_'
 
 		private _onMouseUp(event?: MouseEvent) {
 			if (event) {
@@ -70,7 +70,7 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			// 当前判断为空容器的条件有:
 			// 1. 不包含子节点且 isContainer 返回 true 的部件
 			// 2. isContainer 返回 true 子节点中只有游标或者内置的触发 tryFocus 方法的部件
-			if (this.isContainer() && (this.children.length === 0 || this._onlyContainsCursorOrPrepend())) {
+			if (this.isContainer() && (this.children.length === 0 || this._onlyContainsCursorOrTriggerResizeWidget())) {
 				return {
 					extraClasses: { root: css.emptyContainer },
 					...properties,
@@ -94,7 +94,7 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		 *
 		 * 延迟触发 tryFocus 方法的部件作为最后一个节点。
 		 */
-		private _onlyContainsCursorOrPrepend() {
+		private _onlyContainsCursorOrTriggerResizeWidget() {
 			if (this.children.length > 2) {
 				return false;
 			}
