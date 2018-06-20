@@ -87,12 +87,9 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		 * 一个空容器中最多会包含两个在设计器中使用的特殊部件，
 		 * 一个是用于显示光标(Cursor)的部件，一个用于延迟触发 tryFocus 方法的部件，
 		 * 这两个不是用户添加的部件，所以要过滤出来。
-		 *
 		 * 一个空容器中有以上两个部件时，约定：
-		 *
-		 * 光标作为第一个节点；
-		 *
-		 * 延迟触发 tryFocus 方法的部件作为最后一个节点。
+		 * 1. 光标作为第一个节点；
+		 * 2. 延迟触发 tryFocus 方法的部件作为最后一个节点。
 		 */
 		private _onlyContainsCursorOrTriggerResizeWidget() {
 			if (this.children.length > 2) {
@@ -150,7 +147,7 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			const { widget, activeWidgetId, onFocus } = this.properties;
 			if (this._isFocus(widget, activeWidgetId)) {
 				if (!this._hasResized()) {
-					// 防止渲染多个 triggerResizeWidget 造成key重复报错
+					// 防止渲染多个 triggerResizeWidget 造成 key 重复报错
 					this.children.push(
 						v('div', (inserted: boolean) => {
 							this._tryFocus(widget, activeWidgetId, onFocus, key);
