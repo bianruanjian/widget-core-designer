@@ -17,7 +17,6 @@
     "@types/grunt": "~0.4.0",
     "@types/node": "^6.0.46",
     "@types/sinon": "^1.16.35",
-    "@types/in":"", 
     "grunt": "^1.0.1",
     "grunt-dojo2": "^0.1.3",
     "grunt-tslint": "^5.0.1",

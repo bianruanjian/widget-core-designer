@@ -28,7 +28,21 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 
 		private _key: string = '';
 
-		private _prepend: string = '__prepend__';
+		/**
+		 * 问题描述
+		 * 部件聚焦时，当通过修改属性值调整聚焦部件的位置且不会触发 Resize Observer 时，
+		 * 如调整 Float 的值，则需要一种方法来触发聚焦部件的重绘方法以获取正确的位置信息（用于重绘聚焦框）。
+		 *
+		 * 注意，Resize Observer 只有在改变了 DOM 节点的 content rect size 时才会触发，而如果将 float 的值从 left 改为 right 时，
+		 * DOM 节点的位置发生了变化，而 rect size 并没有发生变化，
+		 * 所以没有触发 Resize Observer，参见 https://wicg.github.io/ResizeObserver/#content-rect。
+		 *
+		 * 解决方法
+		 *
+		 * 在聚焦部件里添加一个子节点，然后在子部件上传入 deferred properties 来延迟触发 tryFocus 方法，
+		 * 即每次绘制完聚焦部件后，都会调用 tryFocus 方法，从而获取到正确的位置信息，实现聚焦框的准确定位。
+		 */
+		private _triggerResizeWidgetKey: string = '__prepend__'; // 如果是系统内使用的字符串，则在字符串的前后分别增加两个 '_'
 
 		private _onMouseUp(event?: MouseEvent) {
 			if (event) {
@@ -54,8 +68,8 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			}
 			// 如果是空容器，则添加可视化效果
 			// 当前判断为空容器的条件有:
-			// 1. 不包含子节点且isContainer返回true的部件
-			// 2. isContainer 返回 true 子节点中只有游标或者内置的prepend节点
+			// 1. 不包含子节点且 isContainer 返回 true 的部件
+			// 2. isContainer 返回 true 子节点中只有游标或者内置的触发 tryFocus 方法的部件
 			if (this.isContainer() && (this.children.length === 0 || this._onlyContainsCursorOrPrepend())) {
 				return {
 					extraClasses: { root: css.emptyContainer },
@@ -69,6 +83,17 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			};
 		}
 
+		/**
+		 * 一个空容器中最多会包含两个在设计器中使用的特殊部件，
+		 * 一个是用于显示光标(Cursor)的部件，一个用于延迟触发 tryFocus 方法的部件，
+		 * 这两个不是用户添加的部件，所以要过滤出来。
+		 *
+		 * 一个空容器中有以上两个部件时，约定：
+		 *
+		 * 光标作为第一个节点；
+		 *
+		 * 延迟触发 tryFocus 方法的部件作为最后一个节点。
+		 */
 		private _onlyContainsCursorOrPrepend() {
 			if (this.children.length > 2) {
 				return false;
@@ -78,8 +103,8 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				if (this.children.length === 1) {
 					return true;
 				}
-				const prependProperties = (this.children[1]! as VNode).properties;
-				if (prependProperties.key === this._prepend) {
+				const triggerResizeWidgetProperties = (this.children[1]! as VNode).properties;
+				if (triggerResizeWidgetProperties.key === this._triggerResizeWidgetKey) {
 					return true;
 				}
 			}
@@ -124,25 +149,29 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		private _resize(key: string) {
 			const { widget, activeWidgetId, onFocus } = this.properties;
 			if (this._isFocus(widget, activeWidgetId)) {
-				if (!this._havePrepend()) {
-					// 防止渲染多个 prepend 造成key重复报错
+				if (!this._hasResized()) {
+					// 防止渲染多个 triggerResizeWidget 造成key重复报错
 					this.children.push(
 						v('div', (inserted: boolean) => {
 							this._tryFocus(widget, activeWidgetId, onFocus, key);
-							return { key: this._prepend }; // 系统内置的节点前后均在前后加两个`_`以做区分
+							return { key: this._triggerResizeWidgetKey };
 						})
 					);
 				}
 			}
 		}
 
-		private _havePrepend() {
+		private _hasResized() {
 			if (this.children) {
-				this.children.forEach((child) => {
-					if ((child as VNode).properties.key && (child as VNode).properties.key === this._prepend) {
-						return true;
-					}
+				const node = find(this.children, (child) => {
+					return (
+						(child as VNode).properties.key !== undefined &&
+						(child as VNode).properties.key === this._triggerResizeWidgetKey
+					);
 				});
+				if (node) {
+					return true;
+				}
 			}
 			return false;
 		}
