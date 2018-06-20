@@ -79,12 +79,14 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 					...properties.widget.properties
 				};
 			}
-			//存在这么一类部件，不属于容器部件，支持value属性，当value值为空且不存在游标之外的子部件的时候需要设置value为'__'
+			// 存在这么一类部件，不属于容器部件，支持 value 属性，当 value 值为空且不存在光标之外的子部件的时候需要设置 value 为 '__'
 			if (
 				!this.isContainer() &&
 				this._valuePropertyIsNull() &&
 				(this.children.length === 0 || this._onlyContainsCursorOrTriggerResizeWidget())
 			) {
+				// 在设计器中，使用 value 覆盖掉 properties.widget.properties 中的 value 属性值。
+				// 但是并不会往 web 版的部件中传修改后的 value 值，还是传 properties.widget.properties 中的 value 值。
 				return {
 					...properties,
 					...properties.widget.properties,
