@@ -44,7 +44,9 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		 */
 		private _triggerResizeWidgetKey: string = '__triggerResize__'; // 如果是系统内使用的字符串，则在字符串的前后分别增加两个 '_'
 
-		private _defaultValue: string = '__';
+		protected getDefaultValue() {
+			return '';
+		}
 
 		private _onMouseUp(event?: MouseEvent) {
 			if (event) {
@@ -79,9 +81,8 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 					...properties.widget.properties
 				};
 			}
-			// 存在这么一类部件，不属于容器部件，支持 value 属性，当 value 值为空且不存在光标之外的子部件的时候需要设置 value 为 '__'
+			// 存在这么一类部件，不属于容器部件，也不需要遮盖层，支持 value 属性，当 value 值为空且不存在光标之外的子部件的时候需要设置 value 为 '__'
 			if (
-				!this.isContainer() &&
 				this._valuePropertyIsNull() &&
 				(this.children.length === 0 || this._onlyContainsCursorOrTriggerResizeWidget())
 			) {
@@ -90,7 +91,7 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				return {
 					...properties,
 					...properties.widget.properties,
-					value: this._defaultValue
+					value: this.getDefaultValue()
 				};
 			}
 			return {
