@@ -44,7 +44,9 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 		 */
 		private _triggerResizeWidgetKey: string = '__triggerResize__'; // 如果是系统内使用的字符串，则在字符串的前后分别增加两个 '_'
 
-		private _defaultValue: string = '__';
+		protected getDefaultValue() {
+			return '';
+		}
 
 		private _onMouseUp(event?: MouseEvent) {
 			if (event) {
@@ -81,8 +83,6 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			}
 			// 存在这么一类部件，不属于容器部件，也不需要遮盖层，支持 value 属性，当 value 值为空且不存在光标之外的子部件的时候需要设置 value 为 '__'
 			if (
-				!this.isContainer() &&
-				!this.needOverlay() &&
 				this._valuePropertyIsNull() &&
 				(this.children.length === 0 || this._onlyContainsCursorOrTriggerResizeWidget())
 			) {
@@ -91,7 +91,7 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				return {
 					...properties,
 					...properties.widget.properties,
-					value: this._defaultValue
+					value: this.getDefaultValue()
 				};
 			}
 			return {
@@ -148,14 +148,6 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			} else {
 				widgetNode = result as VNode;
 				key = String(widgetNode.properties.key);
-				// form 表单部件中 label 居左的时候，存在 div 包裹 label 与 textInput 部件, 故需要对此做处理
-				if (key === 'undefined') {
-					let node = find(widgetNode.children as DNode[], (elm, index, array) => {
-						return elm !== null && (elm as VNode).properties.key !== undefined;
-					});
-					widgetNode = node as VNode;
-					key = String(widgetNode.properties.key);
-				}
 				result = [result];
 			}
 			this._key = key;
