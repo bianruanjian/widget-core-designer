@@ -20,7 +20,7 @@ export default class Overlay extends WidgetBase<OverlayProperties> {
 				classes: css.root,
 				styles: {
 					top: `${dimensions.offset.top}px`,
-					left: `${dimensions.position.left}px`,
+					left: `${dimensions.offset.left}px`,
 					height: `${dimensions.size.height}px`,
 					width: `${dimensions.size.width}px`
 				},
