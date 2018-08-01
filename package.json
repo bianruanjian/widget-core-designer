@@ -1,6 +1,6 @@
 {
   "name": "widget-core-designer",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "dependencies": {
     "@dojo/framework": "~3.0.1",
     "tslib": "~1.8.1"
