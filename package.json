@@ -2,11 +2,7 @@
   "name": "widget-core-designer",
   "version": "0.0.8",
   "dependencies": {
-    "@dojo/core": "~2.0.0",
-    "@dojo/has": "~2.0.0",
-    "@dojo/shim": "~2.0.0",
-    "@dojo/i18n": "~2.0.0",
-    "@dojo/widget-core": "~2.0.0",
+    "@dojo/framework": "~3.0.1",
     "tslib": "~1.8.1"
   },
   "devDependencies": {

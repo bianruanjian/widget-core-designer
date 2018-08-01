@@ -1,14 +1,14 @@
 import { UIInstWidget } from './interfaces';
-import { Dimensions, DimensionResults } from '@dojo/widget-core/meta/Dimensions';
-import { afterRender } from '@dojo/widget-core/decorators/afterRender';
-import { Constructor, DNode, VNode } from '@dojo/widget-core/interfaces';
-import { WidgetBase } from '@dojo/widget-core/WidgetBase';
-import { beforeProperties } from '@dojo/widget-core/decorators/beforeProperties';
+import { Dimensions, DimensionResults } from '@dojo/framework/widget-core/meta/Dimensions';
+import { afterRender } from '@dojo/framework/widget-core/decorators/afterRender';
+import { Constructor, DNode, VNode } from '@dojo/framework/widget-core/interfaces';
+import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
+import { beforeProperties } from '@dojo/framework/widget-core/decorators/beforeProperties';
 import * as css from './styles/base.m.css';
 import Overlay from './Overlay';
-import { find } from '@dojo/shim/array';
-import { v, w } from '@dojo/widget-core/d';
-import { Resize } from '@dojo/widget-core/meta/Resize';
+import { find } from '@dojo/framework/shim/array';
+import { v, w } from '@dojo/framework/widget-core/d';
+import { Resize } from '@dojo/framework/widget-core/meta/Resize';
 import { EditableWidgetProperties } from './interfaces';
 
 export interface DesignerWidgetMixin {

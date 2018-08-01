@@ -1,9 +1,9 @@
-import { WidgetBase } from '@dojo/widget-core/WidgetBase';
-import { DimensionResults } from '@dojo/widget-core/meta/Dimensions';
+import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
+import { DimensionResults } from '@dojo/framework/widget-core/meta/Dimensions';
 
 import * as css from './styles/Overlay.m.css';
-import { v } from '@dojo/widget-core/d';
-import { VNode } from '@dojo/widget-core/interfaces';
+import { v } from '@dojo/framework/widget-core/d';
+import { VNode } from '@dojo/framework/widget-core/interfaces';
 
 export interface OverlayProperties {
 	dimensions: DimensionResults;
