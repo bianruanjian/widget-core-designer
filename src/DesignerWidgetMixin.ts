@@ -77,8 +77,8 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 			if (this.isContainer() && (this.children.length === 0 || this._onlyContainsCursor())) {
 				return {
 					extraClasses: { root: css.emptyContainer },
-					...properties,
-					...properties.widget.properties
+					...properties.widget.properties,
+					...properties
 				};
 			}
 			// 存在这么一类部件，不属于容器部件，也不需要遮盖层，支持 value 属性，当 value 值为空且不存在光标之外的子部件的时候需要设置 value 为 '__'
@@ -86,14 +86,14 @@ export function DesignerWidgetMixin<T extends new (...args: any[]) => WidgetBase
 				// 在设计器中，使用 value 覆盖掉 properties.widget.properties 中的 value 属性值。
 				// 但是并不会往 web 版的部件中传修改后的 value 值，还是传 properties.widget.properties 中的 value 值。
 				return {
-					...properties,
 					...properties.widget.properties,
+					...properties,
 					value: this.getDefaultValue()
 				};
 			}
 			return {
-				...properties,
-				...properties.widget.properties
+				...properties.widget.properties,
+				...properties
 			};
 		}
 
